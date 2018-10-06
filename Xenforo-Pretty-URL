@@ -1,0 +1,42 @@
+server{ 
+    listen   443;
+    server_name  forums.yourwebsite.net;
+    root   /var/www/forums.yourwebsite.net;
+    index  index.html index.htm index.php;
+   
+    ssl on;
+    ssl_certificate /etc/nginx/ssl/forums.yourwebsite.net.crt;
+    ssl_certificate_key /etc/nginx/ssl/forums.yourwebsite.net.key;
+
+
+    location / {
+        try_files $uri $uri/ /index.php?$uri&$args;
+    }
+
+    location ~ /(internal_data|library) {
+         internal;
+    }
+
+
+location /install/data/ {
+	internal;
+}
+location /install/templates/ {
+	internal;
+}
+location /internal_data/ {
+	internal;
+}
+location /library/ {
+	internal;
+}
+
+     location ~* \.php$ {
+                fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+                fastcgi_index index.php;
+                fastcgi_split_path_info ^(.+\.php)(.*)$;
+                include fastcgi_params;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+  
+}
